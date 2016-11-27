@@ -24,7 +24,7 @@ First, add act_as_temptable to your ActiveRecord model.
 ```ruby
 class UserGame < ActiveRecord::Base
     acts_as_temptable :sql => lambda { |param| 
-        "select u.*,g.* from users u join games g on u.game_id=g.id where u.league_id=#{param[:league_id]}" 
+        "select u.*,g.* from users u join games g on u.game_id=g.id where u.league_id=#{sanitize(param[:league_id])}" 
     }
 end
 ```
