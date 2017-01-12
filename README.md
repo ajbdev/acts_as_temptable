@@ -1,8 +1,6 @@
 # Temptable
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/temptable`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Use a temporary table as the data source for your ActiveRecord model.
 
 ## Installation
 
@@ -21,18 +19,32 @@ Or install it yourself as:
     $ gem install temptable
 
 ## Usage
+First, add act_as_temptable to your ActiveRecord model.
 
-TODO: Write usage instructions here
+```ruby
+class UserGame < ActiveRecord::Base
+    acts_as_temptable :sql => lambda { |param| 
+        "select u.*,g.* from users u join games g on u.game_id=g.id where u.league_id=#{sanitize(param[:league_id])}" 
+    }
+end
+```
+Second, invoke the temp_table method along with any parameters necessary to create the temp table.
+
+```ruby
+UserGame.temp_table :league_id => 552
+```
+
+This sets the active record model to query against the temp table. Any subsequent queries will run against the temp table.
+
+The temp table is only created once when the temp_table method is executed, and only created again when the temp_table method is executed again.
 
 ## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/temptable.
+Bug reports and pull requests are welcome on GitHub at https://github.com/ajbdev/temptable.
 
 
 ## License
