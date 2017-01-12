@@ -17,7 +17,6 @@ module Temptable
 
       def temp_table(params = {})
         self.temp_table_params = params
-        self.destroy_temp_table
         self.ensure_temp_table_created
       end
 
@@ -37,13 +36,18 @@ module Temptable
       end
 
       def is_temp_table_created?
-        connection.execute("SELECT COUNT(*) FROM pg_catalog.pg_class WHERE relkind = 'r' AND relname = #{connection.quote(self.temp_table_name)}")
+        connection.execute("SELECT COUNT(*) FROM pg_catalog.pg_class WHERE relkind = 'r' AND relname = '#{self.temp_table_name}'")
             .to_a[0]["count"]
             .to_i > 0
       end
 
       def destroy_temp_table
         connection.execute("DROP TABLE IF EXISTS #{self.temp_table_name}")
+      end
+
+      def recreate_temp_table
+        destroy_temp_table
+        create_temp_table
       end
 
       def create_temp_table
